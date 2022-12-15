@@ -1,0 +1,22 @@
+#+NAME:    readme.org
+#+AUTHOR:  nbehrnd@yahoo.com
+#+LICENSE: nil
+#+DATE:    [2022-12-12 Mon]
+#+EDIT:
+
+This folder archives auxillary files to deposit ~markdownlint~ as .deb package
+into the repositories of Debian.
+
++ When running ~gem2deb~ as recommended, there is a ~copyright~ file written.
+  Scripts ~git_report.sh~ and ~simpler_list.py~ assist in preparation
+  (intermediate of the former: ~report.txt~, intermediate of the later:
+  ~shortlist.txt~)
++ Though not yet identified where this should enter the creation of the .deb
+  package, a man page (~mdl.1~) was written.  It basically copy-pastes the help
+  menu already offered.  Attribution to ~man1~ appears reasonable because the
+  tool's interface is English, and it is a user command (cf
+  https://unix.stackexchange.com/questions/3586/what-do-the-numbers-in-a-man-page-mean)
+
+END
+
+

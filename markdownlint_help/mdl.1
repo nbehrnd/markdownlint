@@ -1,0 +1,70 @@
+.TH mdl 1
+
+.SH NAME
+ruby-mdl
+
+.SH SYNOPSIS
+mdl [options] [FILE.md|DIR ...]
+
+.SH DESCRIPTION
+This Ruby application checks an individual markdown file/a directory
+of markdown files for syntax consistency.  It lives in the shell.
+
+.SH OPTIONS
+.IP \-c,\ \--config\ FILE
+The configuration file to use
+.IP \-g,\ \--git-recurse
+Only process files known to git when given a directory
+.IP \-i,\ \--[no]-ignore-front-matter
+Ignore YAML front matter
+.IP \-j,\ \--json
+JSON output
+.IP \-l,\ \--list-rules
+Don't process any files, just list enabled rules
+.IP \-r,\ \--rules\ RULE1,RULE2
+Only process these rules
+.IP \-u,\ \--rulesets\ RULESET1,RULESET2
+Specify additional ruleset files to load
+.IP \-a,\ \--[no]show-aliases
+Show rule aliases instead of rule ID when viewing rules
+.IP \-w,\ \--[no]warnings
+Show kramdown warnings
+.IP \-d,\ \--skip-default-ruleset
+Don't load the default markdownlint ruleset
+.IP \-s,\ \--style STYLE
+Load the given style
+.IP \-t,\ \--tags TAG1,TAG2
+Only process rules with these tags
+.IP \-v,\ \--[no-]verbose
+Increase verbosity
+.IP \-h,\ \--help
+Show this message
+.IP \-V,\ \--version
+Show version
+
+.SH AUTHOR
+Mark Harrison, Ciro Santilli, Making GitHub Delicious, Brandon High,
+Matt Jankowski, David Anson, Tobias Bengfort, Loic Nageleisen, Will
+Fleming, Jean-Christophe Gay, sudodoki, David Rodríguez, Garth
+Braithwaite, Alexander Köplinger, Simon Symeonidis, Jakub Wilk, Eitan
+Adler, David Rodríguez, Phil Dibowitz, David Somers-Harris,
+copperwalls, John Trammell, Waylan Limberg, Ash, Paul B, Andrew
+Janke, Adam Strickland, Naomi Reeves, Olle Jonsson, Lauritz Hilsøe,
+Andrew Janke Roman Kolesnev, Alex Harvey, Tim Smith, Tim Smith,
+tsuburin, Mikael Kjaer, Caleb Buxton, Mark E. Schill, Waldir Pimenta,
+Ben van B, Jose Angel Pardillo Vela, androidseb, jtcarnes, Gene
+Gotimer, Sami Ahmed Siddiqui, Karol Babioch, Eric Knibbe, Alexander
+Jaust, orviz, Lennart Jern, Benjamin Quorning, Ting Chen, Kai,
+adamroyjones, Bengt Lüers, JP Hastings-Spital
+
+.SH LICENSE
+MIT
+
+.SH REPORTING BUGS
+Report bugs to and suggest improvements on the project page,
+.br
+.UR https://github.com/markdownlint/markdownlint
+.UE
+
+.SH VERSION
+This is about markdownlint version 0.12.0 (October 18th, 2022).
