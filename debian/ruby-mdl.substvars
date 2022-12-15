@@ -1,0 +1,3 @@
+ruby:Depends=ruby, ruby-kramdown (>= 2.3), ruby-kramdown-parser-gfm (>= 1.1), ruby-mixlib-cli (>= 2.1), ruby-mixlib-cli (>= 2.1.1), ruby-mixlib-config (>= 2.2.1), ruby-mixlib-config (<< 4), ruby-mixlib-shellout
+misc:Depends=
+misc:Pre-Depends=

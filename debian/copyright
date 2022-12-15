@@ -1,0 +1,85 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: mdl
+Upstream-Contact: ["phil@ipom.com"]
+Source: https://github.com/markdownlint/markdownlint
+
+Files: *
+Copyright: 2014 Mark Harrison <mark@mivok.net>
+           2014 Ciro Santilli <ciro.santilli@gmail.com>
+           2014 Making GitHub Delicious. <iron@waffle.io>
+           2014 Brandon High <brandon.high@puppetlabs.com>
+           2015 Matt Jankowski <mjankowski@thoughtbot.com>
+           2015 David Anson <david@dlaa.me>
+           2015 Tobias Bengfort <tobias.bengfort@gmx.net>
+           2015 Loic Nageleisen <loic.nageleisen@gmail.com>
+           2016 Will Fleming <will@flemi.ng>
+           2016 Jean-Christophe GAY <contact@jeanchristophegay.com>
+           2016 sudodoki <smd.deluzion@gmail.com>
+           2016 David Rodríguez <deivid.rodriguez@gmail.com>
+           2016 Garth Braithwaite <garthdb@gmail.com>
+           2015 Alexander Köplinger <alex.koeplinger@outlook.com>
+           2017 Simon Symeonidis <lethaljellybean@gmail.com>
+           2017 Jakub Wilk <jwilk@jwilk.net>
+           2017 Eitan Adler <grimreaper@users.noreply.github.com>
+           2017 David Rodríguez <deivid.rodriguez@riseup.net>
+           2018 Phil Dibowitz <phil@ipom.com>
+           2018 David Somers-Harris <david@somers-harris.com>
+           2018 copperwalls <edo@iterm.ninja>
+           2017 John Trammell <tram0004@umn.edu>
+           2018 Waylan Limberg <waylan.limberg@icloud.com>
+           2018 Ash <ajorpheus@users.noreply.github.com>
+           2019 Paul B <paul@bonaud.fr>
+           2019 Andrew Janke <floss@apjanke.net>
+           2019 Adam Strickland <adam.strickland@gmail.com>
+           2019 Naomi Reeves <NaomiReeves@users.noreply.github.com>
+           2019 Olle Jonsson <olle.jonsson@gmail.com>
+           2019 Lauritz Hilsøe <mail+gh@lauritz.me>
+           2019 Andrew Janke <andrew@apjanke.net>
+           2019 Roman Kolesnev <rvkolesnev@gmail.com>
+           2019 Alex Harvey <alexharv074@gmail.com>
+           2019 Tim Smith <tsmith@chef.io>
+           2019 Tim Smith <tsmith84@gmail.com>
+           2019 tsuburin <tsuburin@gmail.com>
+           2019 Mikael Kjaer <mkjaer@users.noreply.github.com>
+           2019 Caleb Buxton <me@cpb.ca>
+           2019 Mark E. Schill <Mark.Schill@cmschill.net>
+           2020 Waldir Pimenta <waldyrious@gmail.com>
+           2020 Ben van B <030@users.noreply.github.com>
+           2020 Jose Angel Pardillo Vela <ja.pv@icloud.com>
+           2020 androidseb <theandroidseb@gmail.com>
+           2020 jtcarnes <56089764+jtcarnes@users.noreply.github.com>
+           2020 Gene Gotimer <eugene.gotimer@steampunk.com>
+           2020 Sami Ahmed Siddiqui <samiahmedsiddiqui@users.noreply.github.com>
+           2021 Karol Babioch <karol@babioch.de>
+           2021 Eric Knibbe <enk3@outlook.com>
+           2021 Alexander Jaust <alexander.jaust@ipvs.uni-stuttgart.de>
+           2022 orviz <orviz@ifca.unican.es>
+           2022 Lennart Jern <lennart.jern@gmail.com>
+           2022 Benjamin Quorning <22333+bquorning@users.noreply.github.com>
+           2022 Ting Chen <cht@bupt.cn>
+           2022 Kai <Schweinepriester@users.noreply.github.com>
+           2022 adamroyjones <10088591+adamroyjones@users.noreply.github.com>
+           2022 Bengt Lüers <Bengt.Lueers@gmail.com>
+           2022 JP Hastings-Spital <jphastings@gmail.com>
+License: MIT
+Comment: The Debian packaging is licensed under the same terms as the source.
+
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -1,0 +1,28 @@
+Source: ruby-mdl
+Section: ruby
+Priority: optional
+Maintainer: Debian Ruby Team <pkg-ruby-extras-maintainers@lists.alioth.debian.org>
+Uploaders: Norwid Behrnd <nbehrnd@yahoo.com>
+Build-Depends: debhelper-compat (= 13),
+               gem2deb (>= 1),
+               ruby (>= 2.7),
+               ruby-kramdown (>= 2.3),
+               ruby-kramdown-parser-gfm (>= 1.1),
+               ruby-mixlib-cli (>= 2.1.1),
+               ruby-mixlib-config (<< 4),
+               ruby-mixlib-config (>= 2.2.1),
+               ruby-mixlib-shellout
+Standards-Version: 4.6.1
+Vcs-Git: https://salsa.debian.org/ruby-team/ruby-mdl.git
+Vcs-Browser: https://salsa.debian.org/ruby-team/ruby-mdl
+Homepage: https://github.com/markdownlint/markdownlint
+Testsuite: autopkgtest-pkg-ruby
+Rules-Requires-Root: no
+
+Package: ruby-mdl
+Architecture: all
+Depends: ${misc:Depends},
+         ${ruby:Depends},
+         ${shlibs:Depends}
+Description: Markdown lint tool
+ Style checker/lint tool for markdown files
