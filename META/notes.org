@@ -1,0 +1,249 @@
+# name: update_notes_markdownlint.org
+# date: [2025-12-13 Sat]
+# edit: [2025-12-16 Tue]
+
+A brief set of notes for the next update of ruby-mdl/markdownlint with
+the corresponding repository on [[https://salsa.debian.org/nbehrnd/ruby-mdl][salsa]].
+
+* prepare for an update
+
+** acknowledgement of the contributors
+
+Copy-paste the BASH script from the salsa repository
+(=debian/git_report.sh=) into the local clone of the GitHub
+repository.  It creates =longlist.txt= about each contributor's first
+commit to the project (content for =debian/copyright=) and
+=shortlist.txt= about the contributor's (pen) name (content for the
+man page).
+
+** check the keys
+
+- For ssh file transfer, salsa requires a valid ssh-key.  If expired,
+  generate a new one
+
+  #+begin_src bash :results nil
+ssh-keygen -t ed25519 -C "an identifying comment"
+  #+end_src
+
+  for =~.ssh=.  To ease recognition, assign a good name; to protect
+  assign a password; copy the public key of the pair (=my_key.pub=) to
+  salsa.
+- While one may use ssh-keys to sign commits to git, =debsign= only
+  accepts GPG keys.
+- Any upload by =dput mentors example.changes= requires
+  =example.changes= to be signed by a recognized GPG key.  If expired,
+  generate a new one
+
+  #+begin_src bash :results nil
+gpg --full-generate-key
+  #+end_src
+
+  with a password, a date of expiration, and a revocation.  Export the
+  public part
+
+  #+begin_src bash :results nil
+gpg --armor --export <GPG KEY ID>
+  #+end_src
+
+  for an eventual copy to the mentors page.
+- Either ssh key or GPG key may be used to sign commits.  Similar to
+  GitHub, if the public keys of the corresponding key pair is known to
+  salsa, there will be a green check mark next to the commit.
+- Don't edit the (optional) comment of a ssh key pair; create a new
+  one instead.
+- The date of expiration of a GPG key equally enters into the
+  computation of the key pair.  While the /fingerprint/ of a GPG key
+  isn't affected by, e.g., an extension, by diffview changes of
+  /sections/ of public keys become visible.  Since e.g., Salsa does
+  not accept two key pairs of identical fingerprint, the elder would
+  need to be /deleted/.
+
+  Since /deletion/ of a key renders all commits signed with it to
+  salsa's inspection "signed, but with an unknown key", it generally
+  is better to use GPG keys with a date of expiration set, and if
+  necessary, to revoke a key.  Then "old keys" no longer in active
+  (signing) use still serve as check reference.
+
+** check local git
+
+Settings usually / globally used may interfere with the update.  E.g.,
+if =DEBEMAIL= defined in =~/.bashrc= differs from the one on line
+=Maintainer:= in file =debian/control=, a call like =dca -i= does not
+create =0.15.0-1= but =0.15.0-1.1=, where the trailing =.1=, or =.2=,
+etc. is indicative for a non-maintainer upload (NMU).  While not wrong
+in the working of the package to provide, =lintian= will request a
+justification for a NMU instead of one by the maintainer known so far.
+
+There is no need to overwrite =.gitrc= for good as changes to git may
+be introduced per project by a flag =--local=.
+
+To check and set if necessary:
+
+- Name and email address (the later must match with the one of the GPG
+  key to be used)
+
+  #+begin_src bash :results nil
+git config --local user.name
+git config --local user.email
+  #+end_src
+
+- inquire (or /list/) the current other /local/ setup:
+  #+begin_src bash :results nil
+git config --local -l
+  #+end_src
+- A frequent pitfall is the definition of the key to be used if one
+  signs commits.  Because it isn't only
+
+  #+begin_src bash :results nil
+git config --local user.signingkey=<key id>
+  #+end_src
+
+  but equally the /format/ of said key e.g.
+
+  #+begin_src bash :results nil
+git config --local gpg.format openpgp
+  #+end_src
+- Simply put, to use ssh keys to sign git commits then requires
+
+  #+begin_src bash :results nil
+    git config --local gpg.format ssh
+    # indicate key by absolute path to key to be used:
+    git config --local user.signingkey ~/.ssh/special_ssh_ed25519.pub
+    git config --local commit.gpgSign true
+  #+end_src
+
+  -- though then using =ssh= (and not =gpg=).
+- At present, the Python implementation of =comitizen= (version 4.9.1)
+  is found /not/ compatible to the automatic signing, i.e.
+
+  #+begin_src bash results nil
+git config --local commit.gpgsign true
+  #+end_src
+
+- Best to run a test commit (which anyway can be amended later).
+
+** building
+
+- The mentors page promptly raises an error if an upload does not
+  provide the source =.dsc= files.  If absent, a package will not be
+  admitted to the public section of the mentors page, too.  Though a
+  subsequent upload is possible, it is simpler to provide all files at
+  once (read =-si= like "sources included").
+
+  #+begin_src bash :results nil
+dpkg-buildpackage -si
+cd ..
+debsign example.changes  # as check if build is signed
+deput mentors example.changes
+  #+end_src
+- The mentors page is set for testing / incremental improvement.  If
+  doing so, previous =any_thing*.mentors.upload= will block an
+  additional upload, so rename the log about the earlier upload.
+
+
+** difference update and backport
+
+- The watch file (=debian/watch=), though still in syntax 4
+  successfully notified the release of mdl, version 0.15.0.  Since it
+  still functional -- which can be checked locally by
+
+  #+begin_src bash :results nil
+    uscan --verbose --no-download
+  #+end_src
+
+  at any time, and given the difficulties about an update to syntax 5,
+  it is retained in place.
+
+- Update: clone the salsa repository
+  - import a new tarball, i.e.
+
+    #+begin_src bash :results nil
+      git checkout master
+      uscan --download
+      gdb import-orig --uscan --pristine-tar
+      gbp dch --auto  # update of file debian/changelog
+    #+end_src
+
+    to
+
+    - update branch =upstream= with a new version (from the Rubygem
+      repository)
+    - update the branch =pristine-tar= both with the tarball as well
+      as the delta files
+    - the (initial merge) of the new upstream version into the default
+      branch =master=.
+
+  - Notes the differences; command
+
+    - =dch -i= /increments/ the version in the changelog
+    - =dch -a= one /adds/ an another note about a modification of the
+      package to be built within the same current version number which
+      is marked with a new =*= "bullet point"
+    - a =dch -e= merely opens an editor to manually edit the change log
+
+    However note to remove any trailing whitespace in file
+    =debian/changelog= which otherwise raises an issue in checks by
+    =lintian=.
+
+* possible improvements next time
+
+** syntax of =debian/watch=
+
+By now ([2025-12-14 Sun]), the watch file kept version 4. This is the
+one described by the [[https://wiki.debian.org/debian/watch][Debian wiki]] (edit [2025-08-31 Sun 19:44:00], link
+to [[https://wiki.debian.org/debian/watch?action=info][Revision history]]).
+
+On the other hand, the man page of =uscan= (version 2.25.28, as in
+Debian 14/forky, branch testing) recommends an update to version 5 by
+the command
+
+#+begin_src bash :results nil
+uscan --update-watchfile
+#+end_src
+
+to act only on this very file.  The syntax in the watch file would be
+different, the file smaller.  For instance =gem2deb= (version 2.2.5)
+currently fetches =mdl= (version 0.15.0) from rubygems to write
+
+#+begin_src sh :results nil
+version=4
+https://gemwatch.debian.net/mdl .*/mdl-(.*).tar.gz
+
+# Use the regex below for github-based sources
+# opts=uversionmangle=s/[_.+-]?(rc|pre|dev|beta|alpha|b|a)/~$1/i,\
+# filenamemangle=s%(?:.+/)?v?@ANY_VERSION@(@ARCHIVE_EXT@)%@PACKAGE@-$1$2% \
+#   https://github.com/<owner>/<repo>/tags .*/v?@ANY_VERSION@@ARCHIVE_EXT@
+#+end_src
+
+-- which is in sync with the Debian wiki page and is functional (/vide
+infra/).  The updated file reads
+
+#+begin_src sh :results nil
+Version: 5
+
+Source: https://gemwatch.debian.net/mdl
+Matching-Pattern: .*/mdl-(.*).tar.gz
+#+end_src
+
+At present ([2025-12-14 Sun]), the new syntax is not compatible with
+the checks on the debian.mentors.net page; indicators previously
+(version 4) green turn yellow for "watch file identified" yet "watch
+file not functional".  This is addressed in
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1122890, filed
+[2025-12-13 Sat].
+
+** locally probe function of =debian/watch=
+
+ #+begin_src bash :results nil
+cd ruby-mdl
+uscan --verbose --no-download
+ #+end_src
+
+** remove of dummy package
+
+For historic reasons, there are/were both an ==ruby-mdl= as well as a
+=markdownlint= /package/.  While entry about the supporting /library/
+=ruby-mdl= is going to stay as such in the books, when Debian 14/forky
+becomes stable the dummy package =ruby-mdl= can be removed for good:
+it already was present .and. marked as dummy some time before Debian
+13/trixie was published as stable.
