@@ -1,13 +1,13 @@
 # name: update_notes_markdownlint.org
 # date: [2025-12-13 Sat]
-# edit: [2025-12-16 Tue]
+# edit: [2026-06-05 Fri]
 
 A brief set of notes for the next update of ruby-mdl/markdownlint with
 the corresponding repository on [[https://salsa.debian.org/nbehrnd/ruby-mdl][salsa]].
 
 * prepare for an update
 
-** acknowledgement of the contributors
+** acknowledgment of the contributors
 
 Copy-paste the BASH script from the salsa repository
 (=debian/git_report.sh=) into the local clone of the GitHub
@@ -63,6 +63,12 @@ gpg --armor --export <GPG KEY ID>
   is better to use GPG keys with a date of expiration set, and if
   necessary, to revoke a key.  Then "old keys" no longer in active
   (signing) use still serve as check reference.
+- If one opts-in into 2FA, User settings -> Access -> Personal access
+  tokens allows to define additional passwords to successfully fetch
+  from, and push to the salsa hosted repositories via the CLI if their
+  scope is includes both =read_repository= and =write_repository=.
+  They are monitored (report includes life time, time and IP of most
+  recent use) in the same directory.
 
 ** check local git
 
@@ -79,6 +85,11 @@ be introduced per project by a flag =--local=.
 
 To check and set if necessary:
 
+- inquire (or /list/) the current other /local/ setup:
+  #+begin_src bash :results nil
+git config --local -l
+  #+end_src
+
 - Name and email address (the later must match with the one of the GPG
   key to be used)
 
@@ -87,40 +98,48 @@ git config --local user.name
 git config --local user.email
   #+end_src
 
-- inquire (or /list/) the current other /local/ setup:
-  #+begin_src bash :results nil
-git config --local -l
-  #+end_src
-- A frequent pitfall is the definition of the key to be used if one
-  signs commits.  Because it isn't only
+- A frequent pitfall is the definition of the /key/ to be used if one
+  signs commits, as well as the /key format/.  Thus, either use a gpg
+  key
 
   #+begin_src bash :results nil
 git config --local user.signingkey=<key id>
-  #+end_src
-
-  but equally the /format/ of said key e.g.
-
-  #+begin_src bash :results nil
 git config --local gpg.format openpgp
   #+end_src
-- Simply put, to use ssh keys to sign git commits then requires
+
+  or a ssh key
 
   #+begin_src bash :results nil
     git config --local gpg.format ssh
     # indicate key by absolute path to key to be used:
     git config --local user.signingkey ~/.ssh/special_ssh_ed25519.pub
-    git config --local commit.gpgSign true
   #+end_src
 
-  -- though then using =ssh= (and not =gpg=).
 - At present, the Python implementation of =comitizen= (version 4.9.1)
   is found /not/ compatible to the automatic signing, i.e.
 
-  #+begin_src bash results nil
+  #+begin_src bash :results nil
 git config --local commit.gpgsign true
   #+end_src
 
 - Best to run a test commit (which anyway can be amended later).
+
+- It might be necessary to build a .deb based on a particular (read:
+  /not/ the most recently published) version of a gem distributed on
+  rubygems.  To fetch and unpack this source, as well as to provide
+  the .orig.tar.gz file eventually required for instance running
+  =dkgp-buildpackage= (if this tarball can not be found elsewhere) the
+  pattern of
+
+  #+begin_src bash :results nil
+gem fetch chef-utils --version 19.2.12
+gem unpack chef-utils-19.2.12.gem
+tar -caf ruby-chef-utils_19.2.12.orig.tar.gz chef-utils-19.2.12
+  #+end_src
+
+  can be useful, for instance to copy-paste the content of this
+  rubygem into the package data /without/ assistance by =uscan= and
+  =d/watch=.
 
 ** building
 
@@ -140,7 +159,6 @@ deput mentors example.changes
   doing so, previous =any_thing*.mentors.upload= will block an
   additional upload, so rename the log about the earlier upload.
 
-
 ** difference update and backport
 
 - The watch file (=debian/watch=), though still in syntax 4
@@ -148,7 +166,7 @@ deput mentors example.changes
   still functional -- which can be checked locally by
 
   #+begin_src bash :results nil
-    uscan --verbose --no-download
+uscan --verbose --no-download
   #+end_src
 
   at any time, and given the difficulties about an update to syntax 5,
@@ -158,10 +176,10 @@ deput mentors example.changes
   - import a new tarball, i.e.
 
     #+begin_src bash :results nil
-      git checkout master
-      uscan --download
-      gdb import-orig --uscan --pristine-tar
-      gbp dch --auto  # update of file debian/changelog
+git checkout master
+uscan --download
+gdb import-orig --uscan --pristine-tar
+gbp dch --auto  # update of file debian/changelog
     #+end_src
 
     to
@@ -184,6 +202,36 @@ deput mentors example.changes
     However note to remove any trailing whitespace in file
     =debian/changelog= which otherwise raises an issue in checks by
     =lintian=.
+
+** preparation of NMU packages
+
+Lessons learnt around =ruby-chef-utils=:
+
+- To eventually update a version =1.2.3= without updating source data,
+  the new version increments to =1.2.3-1=, then =1.2.3-2=, etc.
+- If a NMU includes a new upstream version, =1.2.3= is followed by
+  =1.2.4-0.1= where =-0.1= then is the proper version indicator of a
+  NMU.
+- If investing for NMU because the usual maintainers don't come back
+  in 2 to 4 weeks after notice, prioritize action on grave / release
+  critical bugs.
+- The intent of NMUs is to bring a package back to work (at all) with
+  minimal changes.  Thus edits on function / style (e.g., adjust to
+  current Debian policy), issues not already reported as (grave) bug
+  are beyond the intent.  These can be tasks for a regular upload by
+  the usual uploader / team maintainer.
+- With the .dsc file of the previously accepted upload to Debain,
+  after local building of the package, run e.g.
+
+  #+begin_src bash :results nil
+nmudiff --old --no-mutt --nondd
+  #+end_src
+
+  to provide a summary of the changes vs. the previous version, to be
+  sent with a different mail program than mutt, with explicit
+  indication to seek a sponsor for the eventual upload to Debian.  To
+  send this to corresponding bug ticket(s) helps the sponsor, though
+  again "the less changes, the better for the NMU".
 
 * possible improvements next time
 
