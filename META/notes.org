@@ -1,6 +1,6 @@
 # name: update_notes_markdownlint.org
 # date: [2025-12-13 Sat]
-# edit: [2026-06-05 Fri]
+# edit: [2026-06-14 Sun]
 
 A brief set of notes for the next update of ruby-mdl/markdownlint with
 the corresponding repository on [[https://salsa.debian.org/nbehrnd/ruby-mdl][salsa]].
@@ -103,7 +103,7 @@ git config --local user.email
   key
 
   #+begin_src bash :results nil
-git config --local user.signingkey=<key id>
+git config --local user.signingkey <key id>
 git config --local gpg.format openpgp
   #+end_src
 
@@ -178,7 +178,7 @@ uscan --verbose --no-download
     #+begin_src bash :results nil
 git checkout master
 uscan --download
-gdb import-orig --uscan --pristine-tar
+gbp import-orig --uscan --pristine-tar
 gbp dch --auto  # update of file debian/changelog
     #+end_src
 
