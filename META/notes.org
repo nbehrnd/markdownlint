@@ -173,7 +173,16 @@ uscan --verbose --no-download
   it is retained in place.
 
 - Update: clone the salsa repository
-  - import a new tarball, i.e.
+  - import a new tarball, to
+    - update branch =upstream= with a new version (from the Rubygem
+      repository)
+    - update the branch =pristine-tar= both with the tarball as well
+      as the delta files
+    - the (initial merge) of the new upstream version into the default
+      branch =master=.
+
+    If "the three branches" are =master= (as the default branch),
+    =upstream=, and =pristine-tar=, the commands in question are
 
     #+begin_src bash :results nil
 git checkout master
@@ -182,15 +191,20 @@ gbp import-orig --uscan --pristine-tar
 gbp dch --auto  # update of file debian/changelog
     #+end_src
 
-    to
+    Multiple Debian Ruby Team managed packages however name their
+    default branch =debian/latest= (instead of =master=),
+    =upstream/latest= (instead of =upstream=), and =pristine-tar=.
+    Then (with =uscan= version 2.26.9, and =gbp= 0.9.43) the three
+    commands above are
 
-    - update branch =upstream= with a new version (from the Rubygem
-      repository)
-    - update the branch =pristine-tar= both with the tarball as well
-      as the delta files
-    - the (initial merge) of the new upstream version into the default
-      branch =master=.
-
+    #+begin_src bash :results nil
+      uscan --download
+      gbp import-orig --uscan --pristine-tar \
+         --upstream-branch="upstream/latest" \
+         --debian-branch="debian/latest"
+      gbp dch --auto --debian-branch="debian/latest"
+    #+end_src
+    
   - Notes the differences; command
 
     - =dch -i= /increments/ the version in the changelog
