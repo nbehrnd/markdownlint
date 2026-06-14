@@ -204,7 +204,7 @@ gbp dch --auto  # update of file debian/changelog
          --debian-branch="debian/latest"
       gbp dch --auto --debian-branch="debian/latest"
     #+end_src
-    
+
   - Notes the differences; command
 
     - =dch -i= /increments/ the version in the changelog
@@ -290,9 +290,13 @@ Matching-Pattern: .*/mdl-(.*).tar.gz
 At present ([2025-12-14 Sun]), the new syntax is not compatible with
 the checks on the debian.mentors.net page; indicators previously
 (version 4) green turn yellow for "watch file identified" yet "watch
-file not functional".  This is addressed in
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1122890, filed
-[2025-12-13 Sat].
+file not functional".
+
+[2026-06-14 Sun]: Though =gem2deb= (version 2.2.8) now generates a
+=d/watch= template of contemporary syntax version 5 (cf.
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1122890 ), the
+mentors page is not yet able to launch it sucessfully, and thus issues
+a warning.
 
 ** locally probe function of =debian/watch=
 
@@ -303,7 +307,7 @@ uscan --verbose --no-download
 
 ** remove of dummy package
 
-For historic reasons, there are/were both an ==ruby-mdl= as well as a
+For historic reasons, there are/were both an =ruby-mdl= as well as a
 =markdownlint= /package/.  While entry about the supporting /library/
 =ruby-mdl= is going to stay as such in the books, when Debian 14/forky
 becomes stable the dummy package =ruby-mdl= can be removed for good:
