@@ -2,8 +2,8 @@
 # date: [2025-12-13 Sat]
 # edit: [2026-06-14 Sun]
 
-A brief set of notes for the next update of ruby-mdl/markdownlint with
-the corresponding repository on [[https://salsa.debian.org/nbehrnd/ruby-mdl][salsa]].
+Notes for the next update of ruby-mdl/markdownlint with the
+corresponding repository on [[https://salsa.debian.org/ruby-team/ruby-mdl][salsa]].
 
 * prepare for an update
 
@@ -150,14 +150,16 @@ tar -caf ruby-chef-utils_19.2.12.orig.tar.gz chef-utils-19.2.12
   once (read =-si= like "sources included").
 
   #+begin_src bash :results nil
-dpkg-buildpackage -si
-cd ..
-debsign example.changes  # as check if build is signed
-deput mentors example.changes
+    dpkg-buildpackage -si
+    cd ..
+    debsign -k <key-id> example*.changes
+    deput mentors example.changes
   #+end_src
+  
 - The mentors page is set for testing / incremental improvement.  If
-  doing so, previous =any_thing*.mentors.upload= will block an
-  additional upload, so rename the log about the earlier upload.
+  doing so, previous =esample*.mentors.upload= will block an
+  additional upload, so rename the log about the earlier upload if
+  present / retained.
 
 ** difference update and backport
 
@@ -251,65 +253,162 @@ nmudiff --old --no-mutt --nondd
 
 ** syntax of =debian/watch=
 
-By now ([2025-12-14 Sun]), the watch file kept version 4. This is the
-one described by the [[https://wiki.debian.org/debian/watch][Debian wiki]] (edit [2025-08-31 Sun 19:44:00], link
-to [[https://wiki.debian.org/debian/watch?action=info][Revision history]]).
+By [2026-07-21 Tue], Baptiste Beauplat announced an upgrade of
+mentors.debian.net to trixie which would allow uscan to now about the
+version 5 syntax
+(https://lists.debian.org/debian-mentors/2026/07/msg00177.html)
 
-On the other hand, the man page of =uscan= (version 2.25.28, as in
-Debian 14/forky, branch testing) recommends an update to version 5 by
-the command
+Independent of this move, locally check for the functionality and
+/probe/ an update of file by
 
 #+begin_src bash :results nil
-uscan --update-watchfile
+  cd ruby-mdl
+  uscan --verbose --no-download
+  uscan --update-watchfile
 #+end_src
 
-to act only on this very file.  The syntax in the watch file would be
-different, the file smaller.  For instance =gem2deb= (version 2.2.5)
-currently fetches =mdl= (version 0.15.0) from rubygems to write
+while preparing a new package within an instance of Debian /testing/.
+By now ([2026-07-25 Sat]) =ruby-mdl= as admitted to Debian testing
+(=0.17.0-2=, accepted by [2026-07-15 Wed]) as well as backport
+(=0.17.0-2~bpo13+1=, accepted [2026-07-24 Fri]) use syntax version 5.
 
-#+begin_src sh :results nil
-version=4
-https://gemwatch.debian.net/mdl .*/mdl-(.*).tar.gz
+- At present ([2026-07-24 Fri], the CI as defined for optional remote
+  checks /on salsa/ used since preparation of a package about version
+  0.17.0 passed well (after exclusion of the =d/.debhelper/= directory
+  from the commit history) on branch =debian/latest=.  It however
+  fails on branch =debian/trixie-backports/=.  Maybe at time of
+  release of "trixie" /as stable/ ([2025-08-09 Sat]) version 5 of the
+  syntax of d/watch was not yet generally accepted, and the check with
+  ucsan equally accounts for this.
 
-# Use the regex below for github-based sources
-# opts=uversionmangle=s/[_.+-]?(rc|pre|dev|beta|alpha|b|a)/~$1/i,\
-# filenamemangle=s%(?:.+/)?v?@ANY_VERSION@(@ARCHIVE_EXT@)%@PACKAGE@-$1$2% \
-#   https://github.com/<owner>/<repo>/tags .*/v?@ANY_VERSION@@ARCHIVE_EXT@
+** remove of the dummy package
+
+At present ([2026-07-25 Sat]) there are both =ruby-mdl= as well as
+=markdownlint= which both lead to =mdl= on the CLI.  Maybe it is not
+necessary / useful to remove =ruby-mdl= for good, for instance because
+=ruby-mdl= highlights /implementation in Ruby/.  See a comment by
+Soren Stoutner while the package was moved to the set of team
+maintained packages,
+https://lists.debian.org/debian-ruby/2026/07/msg00012.html.
+
+If considered, edit d/control, as well as the description on salsa.
+
+** account for new name space
+
+After admission of 0.17.0-2 to testing, the project to package the
+syntax checker was moved.  The old address was
+salsa.debian.org/nbehrnd/ruby-mdl, with joining the Debian Ruby Team
+and bringing it to their name space, it now is
+salsa.debian.org/ruby-team/ruby-mdl.  This /alone/ does not
+necessarily merits a new upload (Soren Stoutner), but maybe it is
+worth in perspective of a new backport to branch stable.
+
+In file d/control, edit the records about
+
+- [ ] =Maintainer:=
+- [ ] add field =Uploader:=
+- [ ] edit =Vcs-Git= and =Vcs-Browser:=
+
+to then current Debian and Debian Ruby Team policy.
+
+** update man page
+
+The manually curated man page does not yet reflect flags =-f= /
+=--fix= which causes the checker to correct issues identified.  This
+was introduced with version 0.16.0 which was superseeded within less
+than a week by 0.17.0 and thus not considered for upload.  A call
+
+#+begin_src bash :results nil
+  mdl -h
 #+end_src
 
--- which is in sync with the Debian wiki page and is functional (/vide
-infra/).  The updated file reads
+however displays it.
 
-#+begin_src sh :results nil
-Version: 5
+Note that only some of the rules are set to "autocorret" if requested
+by =--fix=.  According to an inspection by claude.ai, as by
+[2026-07-19 Sun], and up and including version 0.17.0 deposit on
+rubygems.org the present scope is
 
-Source: https://gemwatch.debian.net/mdl
-Matching-Pattern: .*/mdl-(.*).tar.gz
+| Rule  | Description                                        |
+|-------+----------------------------------------------------|
+| MD009 | Trailing spaces                                    |
+| MD010 | Hard tabs                                          |
+| MD012 | Multiple consecutive blank lines                   |
+| MD018 | No space after hash on atx header                  |
+| MD019 | Multiple spaces after hash on atx header           |
+| MD021 | Multiple spaces inside hashes on closed atx header |
+| MD023 | Headers must start at the beginning of the line    |
+| MD027 | Multiple spaces after blockquote symbol            |
+| MD047 | File should end with a single newline              |
+|-------+----------------------------------------------------|
+
+Though rule MD013 (overly long lines) /is not/ implemented in 0.17.0,
+it is discussed and can be presumd as "under construction".
+
+Locally checked (mdl 0.17.0 as provided by Debian 14/forky), the
+correction option functional in the Debian package, for instance works
+in a pattern like
+
+#+begin_src bash :results nil
+  @deb14:~/Desktop/mdltest$ mdl test.md 
+  test.md:1: MD009 Trailing spaces
+  test.md:3: MD009 Trailing spaces
+  test.md:1: MD041 First line in file should be a top level header
+  @deb14:~/Desktop/mdltest$ mdl -f test.md 
+  test.md:1: MD009 Trailing spaces (corrected)
+  test.md:3: MD009 Trailing spaces (corrected)
+  test.md:1: MD041 First line in file should be a top level header
+  @deb14:~/Desktop/mdltest$ mdl test.md 
+  test.md:1: MD041 First line in file should be a top level header
 #+end_src
 
-At present ([2025-12-14 Sun]), the new syntax is not compatible with
-the checks on the debian.mentors.net page; indicators previously
-(version 4) green turn yellow for "watch file identified" yet "watch
-file not functional".
+At time of a new upload to branch /testing/, the scope of =--fix=
+might differ.
 
-[2026-06-14 Sun]: Though =gem2deb= (version 2.2.8) now generates a
-=d/watch= template of contemporary syntax version 5 (cf.
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1122890 ), the
-mentors page is not yet able to launch it sucessfully, and thus issues
-a warning.
+** interaction with the new name space on salsa
 
-** locally probe function of =debian/watch=
+The package now is within the name spac of the Debian Ruby Team.  The
+interaction with the corresponding repository uses =ssh=, and to pull
+from / push to the repository requires both =git= as well as
+=ruby-gitlab=.  See its [[https://wiki.debian.org/Teams/Ruby/Packaging#Using_Git][Wiki]] with hints relevant to packaging, for
+instance about
 
- #+begin_src bash :results nil
-cd ruby-mdl
-uscan --verbose --no-download
- #+end_src
+- how to check the connection to salsa via ssh
 
-** remove of dummy package
+  #+begin_src bash :results nil
+    ssh -vT git@salsa.debian.org
+  #+end_src
 
-For historic reasons, there are/were both an =ruby-mdl= as well as a
-=markdownlint= /package/.  While entry about the supporting /library/
-=ruby-mdl= is going to stay as such in the books, when Debian 14/forky
-becomes stable the dummy package =ruby-mdl= can be removed for good:
-it already was present .and. marked as dummy some time before Debian
-13/trixie was published as stable.
+- use of a stanza in =~/.ssh/config= (for security, protected by a
+  =chmod 600=) for a more comfortable connection
+
+  #+begin_src bash :results nil
+    Host salsa.debian.org
+        User git
+        IdentityFile ~/.ssh/id_ed25519_my_key_for_salsa
+        IdentitiesOnly yes
+  #+end_src
+
+** test suite
+
+The upstream repository of markdownlint on GitHub includes automated
+tests.  Based on an entry about version 0.8.0 (2019-11-08) in
+=CHANGELOG.md=, the maintainers of markdownlint decided against the
+inclusion of test and example files for the gem deposit on
+rubygems.org.
+
+Next time, check for the presence -- and if still missing, consider
+its addition -- of the test suite for Debian.  As an example, while
+running
+
+#+begin_src bash :results nil
+  gbp buildpackage --git-debian-branch=debian/trixie-backports
+#+end_src
+
+to prepare =0.17.0-2~bpo13+1= reported a
+
+#+begin_src bash :results nil
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │ Run tests for ruby3.3: no test suite!                                        │
+  └──────────────────────────────────────────────────────────────────────────────┘
+#+end_src
