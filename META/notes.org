@@ -1,6 +1,6 @@
 # name: update_notes_markdownlint.org
 # date: [2025-12-13 Sat]
-# edit: [2026-06-14 Sun]
+# edit: [2026-09-17 Thu]
 
 Notes for the next update of ruby-mdl/markdownlint with the
 corresponding repository on [[https://salsa.debian.org/ruby-team/ruby-mdl][salsa]].
@@ -80,48 +80,43 @@ etc. is indicative for a non-maintainer upload (NMU).  While not wrong
 in the working of the package to provide, =lintian= will request a
 justification for a NMU instead of one by the maintainer known so far.
 
-There is no need to overwrite =.gitrc= for good as changes to git may
-be introduced per project by a flag =--local=.
+- There is no need to overwrite =.gitrc= for good as changes to git may be
+  introduced per project by a flag =--local=.
 
-To check and set if necessary:
-
-- inquire (or /list/) the current other /local/ setup:
-  #+begin_src bash :results nil
-git config --local -l
-  #+end_src
-
-- Name and email address (the later must match with the one of the GPG
-  key to be used)
+  To check run
 
   #+begin_src bash :results nil
-git config --local user.name
-git config --local user.email
+  git config --local -l
   #+end_src
 
-- A frequent pitfall is the definition of the /key/ to be used if one
-  signs commits, as well as the /key format/.  Thus, either use a gpg
-  key
+  Else define / overwrite in pattern of
 
   #+begin_src bash :results nil
-git config --local user.signingkey <key id>
-git config --local gpg.format openpgp
+  git config --local core.editor "vim"
+  git config --local merge.tool "kdiff3"
+  git config --local user.name "Pen Paper"
+  git config --local user.email "pen@paper.com"
+
+  # if commits are to be signed with a GPG key:
+  git config --local user.signingkey 1234ABCD1234ABCD
+  git config --local gpg.format openpgp
+
+  # if commits are to be signed with a ssh key:
+  git config --local user.signingkey ~/.ssh/special_ssh_ed25519.pub
+  git config --local gpg.format ssh
   #+end_src
 
-  or a ssh key
+- At present ([2026-09-17 Thu]), the Python implementation of =comitizen= (version
+  4.18.1) is found compatible to the automatic signing, i.e.
 
   #+begin_src bash :results nil
-    git config --local gpg.format ssh
-    # indicate key by absolute path to key to be used:
-    git config --local user.signingkey ~/.ssh/special_ssh_ed25519.pub
+  git config --local commit.gpgsign true
   #+end_src
 
-- At present, the Python implementation of =comitizen= (version 4.9.1)
-  is found /not/ compatible to the automatic signing, i.e.
-
-  #+begin_src bash :results nil
-git config --local commit.gpgsign true
-  #+end_src
-
+  in presence of =ssh-askpass= (version 1:1.2.4.1-16+b1) -- a small widget opens
+  to request the input of the password (presuming aside of =chmod= the ssh key is
+  set up with this protection).  However the password has to be entered each
+  time.
 - Best to run a test commit (which anyway can be amended later).
 
 - It might be necessary to build a .deb based on a particular (read:
@@ -155,9 +150,9 @@ tar -caf ruby-chef-utils_19.2.12.orig.tar.gz chef-utils-19.2.12
     debsign -k <key-id> example*.changes
     deput mentors example.changes
   #+end_src
-  
+
 - The mentors page is set for testing / incremental improvement.  If
-  doing so, previous =esample*.mentors.upload= will block an
+  doing so, previous =example*.mentors.upload= will block an
   additional upload, so rename the log about the earlier upload if
   present / retained.
 
@@ -183,29 +178,29 @@ uscan --verbose --no-download
     - the (initial merge) of the new upstream version into the default
       branch =master=.
 
-    If "the three branches" are =master= (as the default branch),
-    =upstream=, and =pristine-tar=, the commands in question are
+        If "the three branches" are =master= (as the default branch),
+        =upstream=, and =pristine-tar=, the commands in question are
 
-    #+begin_src bash :results nil
-git checkout master
-uscan --download
-gbp import-orig --uscan --pristine-tar
-gbp dch --auto  # update of file debian/changelog
-    #+end_src
+        #+begin_src bash :results nil
+    git checkout master
+    uscan --download
+    gbp import-orig --uscan --pristine-tar
+    gbp dch --auto  # update of file debian/changelog
+        #+end_src
 
-    Multiple Debian Ruby Team managed packages however name their
-    default branch =debian/latest= (instead of =master=),
-    =upstream/latest= (instead of =upstream=), and =pristine-tar=.
-    Then (with =uscan= version 2.26.9, and =gbp= 0.9.43) the three
-    commands above are
+        Multiple Debian Ruby Team managed packages however name their
+        default branch =debian/latest= (instead of =master=),
+        =upstream/latest= (instead of =upstream=), and =pristine-tar=.
+        Then (with =uscan= version 2.26.9, and =gbp= 0.9.43) the three
+        commands above are
 
-    #+begin_src bash :results nil
-      uscan --download
-      gbp import-orig --uscan --pristine-tar \
-         --upstream-branch="upstream/latest" \
-         --debian-branch="debian/latest"
-      gbp dch --auto --debian-branch="debian/latest"
-    #+end_src
+        #+begin_src bash :results nil
+          uscan --download
+          gbp import-orig --uscan --pristine-tar \
+             --upstream-branch="upstream/latest" \
+             --debian-branch="debian/latest"
+          gbp dch --auto --debian-branch="debian/latest"
+        #+end_src
 
   - Notes the differences; command
 
@@ -218,6 +213,56 @@ gbp dch --auto  # update of file debian/changelog
     However note to remove any trailing whitespace in file
     =debian/changelog= which otherwise raises an issue in checks by
     =lintian=.
+
+- Backport
+
+  - Collect the .dsc and archives about the version already accepted to
+    /testing/, for instance at
+    https://packages.debian.org/source/forky/ruby-mdl
+  - check-out the default branches =debian/latest=, =pristine-tar=, and
+    =upstream/latest=
+  - continue with the checkout of the branch to host the new backport, for
+    instance =debian/trixie-backports=
+  - update the content with achievements of branch /testing/ by
+
+    #+begin_src bash :results nil
+   git merge origin/debian/latest
+    #+end_src
+
+    This may create merge conflicts (resolve by assistance of =git mergetool=).
+    Ensure file d/changelog tracks all previous edits leading up to the latest
+    release /of to testing/ prior to the backport now under construction.
+  - Announce the backport to d/changelog by =dch --bpo=.  Inspect d/changelog
+    for correct email address; there should be no trailing whitespace -
+    neither on lines, nor a final blank line.
+  - Secure the state by
+
+    #+begin_src bash :results nil
+   git add debian/changelog
+   git commit -m "Backport upstream version x.y.z." -sS
+    #+end_src
+
+    with an optional DCO and GPG signature (known to salsa and not yet
+    expired).
+  - Section /Packaging/ on [[https://backports.debian.org/Contribute/][backports.debian.org]] /recommends/ "to include in the
+    changes file all changelog entries since the last version on
+    debian-backports or since stable if it's the first version. You should do
+    this by passing "-v" to dpkg-buildpackage. E.g.: "sbuild
+    --debbuildopt='-v0.7.5-2'" or "debuild -v0.7.5-2", where "0.7.5-2" is the
+    version in stable."
+
+    Let's say the most recent version to /testing/ is =0.18.1+ds-2= is to be used
+    to provide =0.18.1+ds-2~bpo13+1=.  On the [[https://tracker.debian.org/pkg/ruby-mdl][package tracker page]], identify the
+    most recent version available to /stable-bpo/ (if absent, /stable/), for
+    instance =0.17.0-2~bpo13+1=.  Then use ~-v=0.17.0-2~bpo13+1~ (no quotes, no
+    spaces) as flag to recapitulate all changes since the most recent version
+    published to /stable/ to the mentors page.  This is a readout for the
+    reviewing sponsor, not an edit of d/changelog.)
+  - Sign by =debsign -k 1234ABCD1234ABCD= and upload =dput mentors= on file
+    .changes as usual.  The upload to the remote repository on salsa launches
+    the CI (including the upstream testsuite).  Don't forget the tag (here
+    =debian/0.18.1+ds-2_bpo13+1= since the tilde is not accepted) and file the
+    RFS ticket.
 
 ** preparation of NMU packages
 
@@ -251,36 +296,6 @@ nmudiff --old --no-mutt --nondd
 
 * possible improvements next time
 
-** syntax of =debian/watch=
-
-By [2026-07-21 Tue], Baptiste Beauplat announced an upgrade of
-mentors.debian.net to trixie which would allow uscan to now about the
-version 5 syntax
-(https://lists.debian.org/debian-mentors/2026/07/msg00177.html)
-
-Independent of this move, locally check for the functionality and
-/probe/ an update of file by
-
-#+begin_src bash :results nil
-  cd ruby-mdl
-  uscan --verbose --no-download
-  uscan --update-watchfile
-#+end_src
-
-while preparing a new package within an instance of Debian /testing/.
-By now ([2026-07-25 Sat]) =ruby-mdl= as admitted to Debian testing
-(=0.17.0-2=, accepted by [2026-07-15 Wed]) as well as backport
-(=0.17.0-2~bpo13+1=, accepted [2026-07-24 Fri]) use syntax version 5.
-
-- At present ([2026-07-24 Fri], the CI as defined for optional remote
-  checks /on salsa/ used since preparation of a package about version
-  0.17.0 passed well (after exclusion of the =d/.debhelper/= directory
-  from the commit history) on branch =debian/latest=.  It however
-  fails on branch =debian/trixie-backports/=.  Maybe at time of
-  release of "trixie" /as stable/ ([2025-08-09 Sat]) version 5 of the
-  syntax of d/watch was not yet generally accepted, and the check with
-  ucsan equally accounts for this.
-
 ** remove of the dummy package
 
 At present ([2026-07-25 Sat]) there are both =ruby-mdl= as well as
@@ -293,81 +308,13 @@ https://lists.debian.org/debian-ruby/2026/07/msg00012.html.
 
 If considered, edit d/control, as well as the description on salsa.
 
-** account for new name space
-
-After admission of 0.17.0-2 to testing, the project to package the
-syntax checker was moved.  The old address was
-salsa.debian.org/nbehrnd/ruby-mdl, with joining the Debian Ruby Team
-and bringing it to their name space, it now is
-salsa.debian.org/ruby-team/ruby-mdl.  This /alone/ does not
-necessarily merits a new upload (Soren Stoutner), but maybe it is
-worth in perspective of a new backport to branch stable.
-
-In file d/control, edit the records about
-
-- [ ] =Maintainer:=
-- [ ] add field =Uploader:=
-- [ ] edit =Vcs-Git= and =Vcs-Browser:=
-
-to then current Debian and Debian Ruby Team policy.
-
 ** update man page
 
-The manually curated man page does not yet reflect flags =-f= /
-=--fix= which causes the checker to correct issues identified.  This
-was introduced with version 0.16.0 which was superseeded within less
-than a week by 0.17.0 and thus not considered for upload.  A call
-
-#+begin_src bash :results nil
-  mdl -h
-#+end_src
-
-however displays it.
-
-Note that only some of the rules are set to "autocorret" if requested
-by =--fix=.  According to an inspection by claude.ai, as by
-[2026-07-19 Sun], and up and including version 0.17.0 deposit on
-rubygems.org the present scope is
-
-| Rule  | Description                                        |
-|-------+----------------------------------------------------|
-| MD009 | Trailing spaces                                    |
-| MD010 | Hard tabs                                          |
-| MD012 | Multiple consecutive blank lines                   |
-| MD018 | No space after hash on atx header                  |
-| MD019 | Multiple spaces after hash on atx header           |
-| MD021 | Multiple spaces inside hashes on closed atx header |
-| MD023 | Headers must start at the beginning of the line    |
-| MD027 | Multiple spaces after blockquote symbol            |
-| MD047 | File should end with a single newline              |
-|-------+----------------------------------------------------|
-
-Though rule MD013 (overly long lines) /is not/ implemented in 0.17.0,
-it is discussed and can be presumd as "under construction".
-
-Locally checked (mdl 0.17.0 as provided by Debian 14/forky), the
-correction option functional in the Debian package, for instance works
-in a pattern like
-
-#+begin_src bash :results nil
-  @deb14:~/Desktop/mdltest$ mdl test.md 
-  test.md:1: MD009 Trailing spaces
-  test.md:3: MD009 Trailing spaces
-  test.md:1: MD041 First line in file should be a top level header
-  @deb14:~/Desktop/mdltest$ mdl -f test.md 
-  test.md:1: MD009 Trailing spaces (corrected)
-  test.md:3: MD009 Trailing spaces (corrected)
-  test.md:1: MD041 First line in file should be a top level header
-  @deb14:~/Desktop/mdltest$ mdl test.md 
-  test.md:1: MD041 First line in file should be a top level header
-#+end_src
-
-At time of a new upload to branch /testing/, the scope of =--fix=
-might differ.
+- check if the scope of optional fixes was extended further.
 
 ** interaction with the new name space on salsa
 
-The package now is within the name spac of the Debian Ruby Team.  The
+The package now is within the namespace of the Debian Ruby Team.  The
 interaction with the corresponding repository uses =ssh=, and to pull
 from / push to the repository requires both =git= as well as
 =ruby-gitlab=.  See its [[https://wiki.debian.org/Teams/Ruby/Packaging#Using_Git][Wiki]] with hints relevant to packaging, for
@@ -389,26 +336,7 @@ instance about
         IdentitiesOnly yes
   #+end_src
 
-** test suite
+** update d/control
 
-The upstream repository of markdownlint on GitHub includes automated
-tests.  Based on an entry about version 0.8.0 (2019-11-08) in
-=CHANGELOG.md=, the maintainers of markdownlint decided against the
-inclusion of test and example files for the gem deposit on
-rubygems.org.
-
-Next time, check for the presence -- and if still missing, consider
-its addition -- of the test suite for Debian.  As an example, while
-running
-
-#+begin_src bash :results nil
-  gbp buildpackage --git-debian-branch=debian/trixie-backports
-#+end_src
-
-to prepare =0.17.0-2~bpo13+1= reported a
-
-#+begin_src bash :results nil
-  ┌──────────────────────────────────────────────────────────────────────────────┐
-  │ Run tests for ruby3.3: no test suite!                                        │
-  └──────────────────────────────────────────────────────────────────────────────┘
-#+end_src
+Contrasting to the man page, d/control (and thus the preview in =apt=) does not
+note that some rules /to check/ are complemented by an optional reformat.
